@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Ghostwriter - AI-Powered Post Generator</title>
+    <meta name="description" content="Turn 3-5 bullet points into polished LinkedIn posts in 30 seconds. Free tier available.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#0a66c2',
+                            100: '#004182',
+                            600: '#0a66c2',
+                            700: '#004182',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-brand-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-900">LinkedIn Ghostwriter</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#how-it-works" class="text-gray-600 hover:text-gray-900 hidden sm:block">How It Works</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-gray-900 hidden sm:block">Pricing</a>
+                    <button onclick="showLoginModal()" class="text-brand-600 hover:text-brand-700 font-medium">Sign In</button>
+                    <button onclick="scrollToGenerator()" class="bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition">Get Started Free</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-brand-600 to-brand-800 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                Write LinkedIn Posts<br/>in 30 Seconds, Not 30 Minutes
+            </h1>
+            <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                Transform 3-5 bullet points into engaging, viral-ready LinkedIn posts using AI. 
+                Free tier available. No credit card required.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="scrollToGenerator()" class="bg-white text-brand-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg">
+                    Try Free - 3 Posts/Month
+                </button>
+                <a href="#how-it-works" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-brand-700 transition">
+                    See How It Works
+                </a>
+            </div>
+            <p class="mt-6 text-blue-200">
+                ✓ No credit card required &nbsp; ✓ 30-second generation &nbsp; ✓ 900M+ LinkedIn users trust the platform
+            </p>
+        </div>
+    </section>
+
+    <!-- Generator App Section -->
+    <section id="generator" class="py-16 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Generate Your LinkedIn Post</h2>
+                <p class="text-gray-600">Enter 3-5 bullet points. Get 3 polished post variations in seconds.</p>
+            </div>
+
+            <!-- Usage Counter -->
+            <div id="usageCounter" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-blue-800 font-medium">Free Plan: </span>
+                        <span id="usageText" class="text-blue-800">1 of 3 posts used this month</span>
+                    </div>
+                    <a href="#pricing" class="text-brand-600 hover:text-brand-700 font-medium">Upgrade to Pro →</a>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="bg-gray-50 rounded-xl p-8 mb-8">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Your Bullet Points (3-5 points)
+                    </label>
+                    <textarea 
+                        id="bulletPoints" 
+                        rows="5" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                        placeholder="• Just closed our biggest deal ever - $500K ARR&#10;• Here's what I learned about enterprise sales&#10;• The #1 mistake most founders make&#10;• Why patience beats hustle&#10;• My framework for scaling to 8-figures"
+                    ></textarea>
+                    <p class="mt-2 text-sm text-gray-500">Pro tip: Be specific. Include numbers, lessons, or contrarian takes.</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Post Style
+                    </label>
+                    <select id="postStyle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                        <option value="professional">Professional & Insightful</option>
+                        <option value="storytelling">Storytelling & Personal</option>
+                        <option value="contrarian">Contrarian & Bold</option>
+                        <option value="educational">Educational & How-To</option>
+                        <option value="celebration">Celebration & Milestone</option>
+                        <option value="lesson-learned">Lesson Learned</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        <span id="charCount">0</span> characters
+                    </div>
+                    <button 
+                        onclick="generatePosts()" 
+                        id="generateBtn"
+                        class="bg-brand-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Generate Posts ✨
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Crafting your posts... (15-30 seconds)</p>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" class="hidden">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Your Generated Posts</h3>
+                
+                <div id="postsContainer" class="space-y-6">
+                    <!-- Posts will be inserted here -->
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="generatePosts()" class="text-brand-600 hover:text-brand-700 font-medium">
+                        ↻ Regenerate with same bullets
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-gray-600">Three simple steps to LinkedIn greatness</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-brand-600">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Dump Your Ideas</h3>
+                    <p class="text-gray-600">Type 3-5 bullet points about your topic. Don't worry about grammar or structure—just brain dump.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-brand-600">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">AI Magic</h3>
+                    <p class="text-gray-600">Our AI transforms your bullets into 3 polished, engaging posts optimized for LinkedIn's algorithm.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-brand-600">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Post & Grow</h3>
+                    <p class="text-gray-600">Pick your favorite, make any tweaks, and post. Watch your engagement soar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Why LinkedIn Ghostwriter?</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">30-Second Generation</h3>
+                        <p class="text-gray-600">From bullets to polished posts in half a minute</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">6 Post Styles</h3>
+                        <p class="text-gray-600">Professional, storytelling, contrarian, educational, and more</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Free Tier Available</h3>
+                        <p class="text-gray-600">Start with 3 free posts per month, no credit card</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Viral-Optimized</h3>
+                        <p class="text-gray-600">Posts structured for maximum engagement and reach</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">One-Click Copy</h3>
+                        <p class="text-gray-600">Copy any post to clipboard instantly</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-green-500 mt-1 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Privacy-First</h3>
+                        <p class="text-gray-600">We don't store your posts or personal data</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-gray-600">Start free, upgrade when you're ready</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Tier -->
+                <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Free</h3>
+                    <p class="text-gray-600 mb-6">Perfect for testing</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$0</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">3 posts per month</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Basic post styles</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">No credit card required</span>
+                        </li>
+                    </ul>
+                    <button onclick="scrollToGenerator()" class="w-full bg-gray-100 text-gray-900 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+                        Get Started Free
+                    </button>
+                </div>
+
+                <!-- Pro Tier -->
+                <div class="bg-white rounded-xl shadow-lg p-8 border-2 border-brand-600 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-brand-600 text-white px-4 py-1 rounded-full text-sm font-medium">Most Popular</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Pro</h3>
+                    <p class="text-gray-600 mb-6">For serious creators</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$15</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Unlimited posts</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">All 6+ post styles</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Custom voice training</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Save & organize drafts</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Priority support</span>
+                        </li>
+                    </ul>
+                    <button onclick="openStripeCheckout('pro')" class="w-full bg-brand-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition">
+                        Start Pro Trial
+                    </button>
+                </div>
+
+                <!-- Lifetime Tier -->
+                <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Lifetime</h3>
+                    <p class="text-gray-600 mb-6">Launch special</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$97</span>
+                        <span class="text-gray-600">one-time</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">All Pro features forever</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">First 50 users only</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Early adopter badge</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Lifetime updates</span>
+                        </li>
+                    </ul>
+                    <button onclick="openStripeCheckout('lifetime')" class="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+                        Get Lifetime Access
+                    </button>
+                    <p class="text-center text-sm text-gray-500 mt-4">⚡ 23 of 50 spots remaining</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Loved by B2B Professionals</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Sarah Chen</p>
+                            <p class="text-sm text-gray-600">Founder, TechStart</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"I went from posting once a month to 3x per week. My engagement increased 400%. This tool pays for itself 10x over."</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Marcus Rodriguez</p>
+                            <p class="text-sm text-gray-600">VP Sales, CloudCo</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"As a sales leader, personal branding is crucial. This saves me 2+ hours per week. The posts sound authentically me."</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Emily Watson</p>
+                            <p class="text-sm text-gray-600">Marketing Consultant</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"I use this for my clients too. Game-changer for agencies. The contrarian style gets insane engagement."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-brand-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Ready to Transform Your LinkedIn Presence?</h2>
+            <p class="text-xl text-blue-100 mb-8">Join thousands of professionals who post consistently without the time investment.</p>
+            <button onclick="scrollToGenerator()" class="bg-white text-brand-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg">
+                Start Free - No Credit Card
+            </button>
+            <p class="mt-4 text-blue-200">3 free posts • 30-second generation • Cancel anytime</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-white font-semibold mb-4">LinkedIn Ghostwriter</h3>
+                    <p class="text-sm">AI-powered LinkedIn post generator for busy professionals.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#generator" class="hover:text-white">Generator</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
+                        <li><a href="#how-it-works" class="hover:text-white">How It Works</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="hover:text-white">Best Practices</a></li>
+                        <li><a href="#" class="hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+                <p>&copy; 2024 LinkedIn Ghostwriter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+# LinkedIn Ghostwriter - Cloudflare Worker Configuration
+# 
+# This file configures your Cloudflare Worker deployment.
+# 
+# Setup Instructions:
+# 1. Install Wrangler: npm install -g wrangler
+# 2. Login: wrangler login
+# 3. Create KV namespace: wrangler kv:namespace create "USAGE_KV"
+# 4. Update the KV namespace ID below
+# 5. Set secrets: wrangler secret put HF_API_TOKEN
+# 6. Deploy: wrangler deploy
+
+name = "linkedin-ghostwriter-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Account configuration (get from Cloudflare dashboard)
+# account_id = "your-account-id-here"
+
+# Workers Free Tier: 100,000 requests/day
+# This should handle 3,000+ users on free tier
+
+# KV Namespace for usage tracking
+[[kv_namespaces]]
+binding = "USAGE_KV"
+id = "replace-with-kv-namespace-id"
+preview_id = "replace-with-preview-kv-namespace-id"
+
+# Environment variables (use secrets for sensitive data)
+[vars]
+HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.3"
+FREE_TIER_LIMIT = 3
+
+# Secrets (set with: wrangler secret put SECRET_NAME)
+# - HF_API_TOKEN: Your Hugging Face API token
+# - STRIPE_WEBHOOK_SECRET: Your Stripe webhook signing secret
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Production environment
+[env.production]
+name = "linkedin-ghostwriter-api-prod"
+# account_id = "your-account-id-here"
+
+[[env.production.kv_namespaces]]
+binding = "USAGE_KV"
+id = "replace-with-production-kv-namespace-id"
+
+# Routes (optional - if using custom domain)
+# [[routes]]
+# pattern = "api.linkedinghostwriter.com/*"
+# zone_name = "linkedinghostwriter.com"
+
+# Triggers (for scheduled tasks, if needed)
+# [triggers]
+# crons = ["0 0 1 * *"] # Reset usage on 1st of each month
+
+# Build configuration (if using TypeScript or bundling)
+# [build]
+# command = "npm run build"
+
+# Minification (recommended for production)
+# minify = true
+
+# Logpush (send logs to Cloudflare Logpush)
+# logpush = true
+
+# Observability
+# [observability]
+# enabled = true
+# head_sampling_rate = 1.0
