@@ -4,6 +4,14 @@
  * Handles user input, API calls, and post generation
  */
 
+// Expose functions globally for onclick handlers
+window.scrollToGenerator = scrollToGenerator;
+window.generatePosts = generatePosts;
+window.copyPost = copyPost;
+window.showLoginModal = showLoginModal;
+window.openStripeCheckout = openStripeCheckout;
+window.regeneratePost = regeneratePost;
+
 // Configuration
 const API_BASE_URL = 'https://your-worker.your-subdomain.workers.dev/api';
 const HF_MODEL = 'mistralai/Mistral-7B-Instruct-v0.3';
@@ -17,12 +25,19 @@ let userUsage = {
 
 let isGenerating = false;
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+function init() {
     loadUserUsage();
     setupEventListeners();
     updateCharCounter();
-});
+    console.log('LinkedIn Ghostwriter initialized');
+}
 
 // Event Listeners
 function setupEventListeners() {
@@ -359,3 +374,11 @@ function openStripeCheckout(plan) {
 function showLoginModal() {
     showToast('Login feature coming soon! For now, usage is tracked locally.');
 }
+
+// Debug: Log all exposed functions
+console.log('LinkedIn Ghostwriter Functions Loaded:');
+console.log('- scrollToGenerator:', typeof window.scrollToGenerator);
+console.log('- generatePosts:', typeof window.generatePosts);
+console.log('- copyPost:', typeof window.copyPost);
+console.log('- showLoginModal:', typeof window.showLoginModal);
+console.log('- openStripeCheckout:', typeof window.openStripeCheckout);
